@@ -1,6 +1,3 @@
-
-
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +6,14 @@ import 'package:grad_project/login.dart';
 import 'package:grad_project/rest.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'client_signup.dart'; // Import the Client SignUp page
 import 'components/firebase_methods.dart';
-import 'handyman_signup.dart'; // Import the Handyman SignUp page
-
+/*
+location => google map
+photo
+photos of past works
+number of people rated this handyman => 0
+average rating from 0 to 5 => 0
+ */
 void main() async{
   // FirebaseAuth.instance.verifyPasswordResetCode(code)
   try{

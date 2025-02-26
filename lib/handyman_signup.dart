@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/components/category_skills.dart';
+import 'package:grad_project/components/location_methods.dart';
 import "package:lottie/lottie.dart";
 import 'login.dart';
-import 'confirm_password.dart';
 
 
 class HandymanSignUp extends StatefulWidget {
@@ -10,9 +11,10 @@ class HandymanSignUp extends StatefulWidget {
 }
 
 class _HandymanSignUpState extends State<HandymanSignUp> {
-  final List<bool> _selectedSkills = List.generate(6, (_) => false);
-  String _selectedCategory = 'Plumbing';
-
+  List<bool> _selectedSkills = List.generate(5, (_) => false);
+  List<String> skillsName = [];
+  String _selectedCategory = 'Carpenter';
+  // Position position = Position(longitude: 0, latitude: 0);
   final TextEditingController _projectInfoController = TextEditingController();
 
   @override
@@ -62,7 +64,31 @@ class _HandymanSignUpState extends State<HandymanSignUp> {
                           ),
                         ),
                         SizedBox(height: 20),
+                        GestureDetector(
+                          onTap: (){
 
+                          },
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 3),
+                                  boxShadow: [
+                                    BoxShadow(color: Colors.black26, blurRadius: 10),
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child: Image.asset('assets/avatar.png', fit: BoxFit.cover),
+                                ),
+                              ),
+                              Icon(Icons.add,size: 100,color: Colors.blueGrey,),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 20),
                         // First and Last Name
                         Row(
                           children: [
@@ -92,7 +118,14 @@ class _HandymanSignUpState extends State<HandymanSignUp> {
                         SizedBox(height: 8),
 
                         // Location
-                        _buildTextField('Location', Icons.location_on),
+                        TextButton(
+                          //TODO
+                          onPressed: () async {
+                            await LocationMethods.getUserLocation();
+                          },
+                          child: Text("Get Location"),
+                        ),
+
                         SizedBox(height: 8),
 
                         // Phone Number
@@ -112,12 +145,15 @@ class _HandymanSignUpState extends State<HandymanSignUp> {
                             ),
                           ),
                           items: [
+                            'Carpenter',
                             'Plumbing',
+                            'Blacksmith',
                             'Electrical',
-                            'Carpentry',
-                            'Painting',
-                            'Cleaning',
-                            'Other'
+                            'Painter',
+                            'Aluminum worker',
+                            'Marble worker',
+                            'Upholsterer',
+                            // 'Other'
                           ]
                               .map((category) => DropdownMenuItem(
                                     child: Text(category),
@@ -125,6 +161,7 @@ class _HandymanSignUpState extends State<HandymanSignUp> {
                                   ))
                               .toList(),
                           onChanged: (value) {
+                            _selectedSkills = List.generate(5, (_) => false);
                             setState(() {
                               _selectedCategory = value!;
                             });
@@ -136,7 +173,7 @@ class _HandymanSignUpState extends State<HandymanSignUp> {
                         Wrap(
                           spacing: 10,
                           runSpacing: 10,
-                          children: List.generate(6, (index) {
+                          children: List.generate(CategorySkills.categorySkills[_selectedCategory]!.length, (index) {
                             return Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -148,7 +185,7 @@ class _HandymanSignUpState extends State<HandymanSignUp> {
                                     });
                                   },
                                 ),
-                                Text('Skill${index + 1}'),
+                                Text('${CategorySkills.categorySkills[_selectedCategory]![index]}',style: TextStyle(color: Colors.deepOrange),),
                               ],
                             );
                           }),
