@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseMethods{
@@ -11,35 +17,45 @@ class FirebaseMethods{
     return querySnapshot.docs.isNotEmpty;
   }
 
-  static void addClientInformation(String name, String email, String phone, String location) {
-    CollectionReference usersInformation = FirebaseFirestore.instance.collection(CollectionsNames.clientsInformation);
-    usersInformation
-        .add({
-      'full_name': name,
-      'email': email,
-      'phone': phone,
-      'location': location,
-    })
-        .then((value) => print("User Added"))
-        .catchError((error) => print("Failed to add user: $error"));
-  }
+  static Future<void> setClientInformation({
+    required String uid,
+    required String email,
+    required String fullName,
+    required double latitude,
+    required double longitude,
+    required String phoneNumber,
+    required DateTime timestamp,
+  }) async {
+    try {
+      // Reference to the Firestore collection
+      final CollectionReference handymenCollection =
+      FirebaseFirestore.instance.collection('client_information');
 
+      // Set or update the document with the given UID
+      await handymenCollection.doc(uid).set({
+        'email': email,
+        'full_name': fullName,
+        'latitude': latitude,
+        'longitude': longitude,
+        'phone_number': phoneNumber,
+        'timestamp': timestamp,
+      }, SetOptions(merge: true)); // Use merge to update specific fields without overwriting the entire document
+
+      print('Handyman information set/updated successfully for UID: $uid');
+    } catch (e) {
+      rethrow;
+    }
+  }
   static Future<void> signInWithEmailPassword(String email, String password) async {
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      // FirebaseAuth.instance.verifyPasswordResetCode(code)
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      }
       rethrow; // Rethrow the exception to handle it in the calling function
     } catch (e) {
-      print(e);
+      // print(e);
       rethrow;
     }
   }
@@ -81,8 +97,73 @@ class FirebaseMethods{
     }
   }
 
-}
+  static Future<String> uploadImage(File imageFile) async {
+    // Get a reference to the storage location
+    final storageRef = FirebaseStorage.instance.ref().child('images/${DateTime.now().millisecondsSinceEpoch}.png');
 
+    // Upload the image
+    final uploadTask = storageRef.putFile(
+      imageFile,
+      SettableMetadata(contentType: 'image/png'), // Set the content type
+    );
+
+    // Monitor the upload progress
+    uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+      print('Progress: ${(snapshot.bytesTransferred / snapshot.totalBytes) * 100}%');
+    });
+
+    // Wait for the upload to complete
+    await uploadTask;
+
+    // Get the download URL
+    String downloadURL = await storageRef.getDownloadURL();
+    return downloadURL;
+    print('File uploaded, download URL: $downloadURL');
+  }
+  static Future<void> setHandymanInformation({
+    required String uid,
+    required String category,
+    required String description,
+    required String email,
+    required String explicitSkills,
+    required String fullName,
+    required String implicitSkills,
+    required double latitude,
+    required double longitude,
+    required String phoneNumber,
+    required String profilePicture,
+    required double ratingAverage,
+    required int ratingCount,
+    required DateTime timestamp,
+  }) async {
+    try {
+      // Reference to the Firestore collection
+      final CollectionReference handymenCollection =
+      FirebaseFirestore.instance.collection('handymen_information');
+
+      // Set or update the document with the given UID
+      await handymenCollection.doc(uid).set({
+        'category': category,
+        'description': description,
+        'email': email,
+        'explicit_skills': explicitSkills,
+        'full_name': fullName,
+        'implicit_skills': implicitSkills,
+        'latitude': latitude,
+        'longitude': longitude,
+        'phone_number': phoneNumber,
+        'profile_picture': profilePicture,
+        'rating_average': ratingAverage,
+        'rating_count': ratingCount,
+        'timestamp': timestamp,
+      }, SetOptions(merge: true)); // Use merge to update specific fields without overwriting the entire document
+
+      print('Handyman information set/updated successfully for UID: $uid');
+    } catch (e) {
+      rethrow;
+    }
+  }
+}
 class CollectionsNames{
   static String clientsInformation = "clients_information";
   static String handymenInformation = "handymen_information";

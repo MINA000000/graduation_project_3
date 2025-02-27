@@ -176,8 +176,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   }
                                 else
                                 {
-                                  print(FirebaseAuth.instance.currentUser!.email);
-                                  return;
+                                  // print(FirebaseAuth.instance.currentUser!.email);
+                                  // return;
                                   await FirebaseAuth.instance.currentUser!.sendEmailVerification();
                                   await DialogUtils.buildShowDialog(context, title: 'Email verification', content: 'Email must be verified first , email send to you', titleColor: Colors.red,);
                                   // Navigator.push(context, MaterialPageRoute(builder: (_)=>ConfirmationScreen()));

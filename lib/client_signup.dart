@@ -2,13 +2,17 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:grad_project/components/build_field.dart';
+import 'package:grad_project/components/dialog_utils.dart';
 import 'package:grad_project/components/firebase_methods.dart';
+import 'package:grad_project/components/validate_inputs.dart';
 import 'package:grad_project/components/wrapper.dart';
 import 'package:grad_project/rest.dart';
 import "package:lottie/lottie.dart";
 import 'package:provider/provider.dart';
 import 'client_signup_google.dart';
+import 'components/location_methods.dart';
 import 'confirm_password.dart';
 import 'login.dart';
 
@@ -24,30 +28,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController _email = TextEditingController();
   TextEditingController _password = TextEditingController();
   TextEditingController _confirm_password = TextEditingController();
-  TextEditingController _location = TextEditingController();
   TextEditingController _phone_number = TextEditingController();
   bool firstSingUp = true;
   bool isEqualPassword = true;
   BoolWrapper passvis1 = BoolWrapper(false);
   BoolWrapper passvis2 = BoolWrapper(false);
   bool isloading = false;
+  bool isloading2 = false;
+  Position? _position;
   void updateState() {
     setState(() {});
   }
 
-  bool validateEmail(String email) {
-    final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return regex.hasMatch(email);
-  }
-
-  bool validatePhoneNumber(String phoneNumber) {
-    final regex = RegExp(r'^\+?[0-9]{8,15}$');
-    return regex.hasMatch(phoneNumber);
-  }
-
-  bool validatePassword(String password) {
-    return password.length >= 6; // Example: Password must be at least 6 characters
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +108,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               firstSingUp,
                             ),
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 6),
                           Expanded(
                             child: BuildField.buildTextField(
                               'Last name',
@@ -159,13 +151,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         passvis2
                       ),
                       const SizedBox(height: 8),
-                      BuildField.buildTextField(
-                        'Location',
-                        Icons.location_on,
-                        TextInputType.streetAddress,
-                        _location,
-                        updateState,
-                        firstSingUp,
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFFFF3C00),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          icon: Icon(Icons.location_on, color: Colors.white),
+                          label: isloading2?CircularProgressIndicator(color: Colors.grey,):Text(
+                            (_position==null)?'Get Location':'Done',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: 'Nunito',
+                              fontWeight: FontWeight.w800,
+                              color: (_position==null)?Colors.white:Colors.green,
+                            ),
+                          ),
+
+                          onPressed: (isloading2||_position!=null)?null:() async {
+                            setState(() {
+                              isloading2 = true;
+                            });
+                            _position = await LocationMethods.getUserLocation();
+                            setState(() {
+                              isloading2 = false;
+                            });
+                          },
+                        ),
                       ),
                       const SizedBox(height: 8),
                       BuildField.buildTextField(
@@ -200,25 +216,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             // Validate fields
                             if (_first_name.text.isEmpty || _last_name.text.isEmpty) {
                               print('Please enter your full name');
-                              await buildShowDialog(context, title: 'Empty name', content: 'First name, Last name cannot be empty', titleColor: Colors.red,);
+                              await DialogUtils.buildShowDialog(context, title: 'Empty name', content: 'First name, Last name cannot be empty', titleColor: Colors.red,);
                               setState(() {
                                 isloading = false;
                               });
                               return;
                             }
 
-                            if (!validateEmail(_email.text)) {
+                            if (!ValidateInputs.validateEmail(_email.text)) {
                               print('Please enter a valid email address');
-                              await buildShowDialog(context, title: 'Invalid email', content: 'Please enter valid email', titleColor: Colors.red,);
+                              await DialogUtils.buildShowDialog(context, title: 'Invalid email', content: 'Please enter valid email', titleColor: Colors.red,);
                               setState(() {
                                 isloading = false;
                               });
                               return;
                             }
 
-                            if (!validatePassword(_password.text)) {
+                            if (!ValidateInputs.validatePassword(_password.text)) {
                               print('Password must be at least 6 characters');
-                              await buildShowDialog(context, title: 'Password length', content: 'Password must be at least 6 characters', titleColor: Colors.red,);
+                              await DialogUtils.buildShowDialog(context, title: 'Password length', content: 'Password must be at least 6 characters', titleColor: Colors.red,);
                               setState(() {
                                 isloading = false;
                               });
@@ -227,25 +243,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                             if (_password.text != _confirm_password.text) {
                               print('Passwords do not match');
-                              await buildShowDialog(context, title: 'Passwords do not match', content: 'password and confirm password do not match', titleColor: Colors.red,);
+                              await DialogUtils.buildShowDialog(context, title: 'Passwords do not match', content: 'password and confirm password do not match', titleColor: Colors.red,);
                               setState(() {
                                 isloading = false;
                               });
                               return;
                             }
 
-                            if (_location.text.isEmpty) {
+                            if (_position==null) {
                               print('Please enter your location');
-                              await buildShowDialog(context, title: 'Empty location', content: 'Please enter your location first', titleColor: Colors.red,);
+                              await DialogUtils.buildShowDialog(context, title: 'Empty location', content: 'press on location button', titleColor: Colors.red,);
                               setState(() {
                                 isloading = false;
                               });
                               return;
                             }
 
-                            if (!validatePhoneNumber(_phone_number.text)) {
+                            if (!ValidateInputs.validatePhoneNumber(_phone_number.text)) {
                               print('Please enter a valid phone number');
-                              await buildShowDialog(context, title: 'Invalid phone number', content: 'Please enter valid phone number', titleColor: Colors.red,);
+                              await DialogUtils.buildShowDialog(context, title: 'Invalid phone number', content: 'Please enter valid phone number', titleColor: Colors.red,);
                               setState(() {
                                 isloading = false;
                               });
@@ -259,15 +275,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               // print(phone_number);
                               // await widget.verifyPhoneNumber(phone_number, context);
                               await FirebaseMethods.signInWithEmailPassword(_email.text, _password.text);
+                              DateTime now = DateTime.now();
                               // Add user information to Firestore
-                              FirebaseMethods.addClientInformation(
-                                '${_first_name.text} ${_last_name.text}', // Full name
-                                _email.text,
-                                _phone_number.text,
-                                _location.text,
-                              );
+                              FirebaseMethods.setClientInformation(uid: FirebaseAuth.instance.currentUser!.uid, email: _email.text, fullName: '${_first_name.text.trim()} ${_last_name.text.trim()}', latitude: _position!.latitude, longitude: _position!.longitude, phoneNumber: _phone_number.text, timestamp: now);
                               await FirebaseAuth.instance.currentUser!.sendEmailVerification();
-                             await buildShowDialog(context, title: 'Done', content: 'Now all you need it to verify your email , email send to you', titleColor: Colors.green,);
+                             await DialogUtils.buildShowDialog(context, title: 'Done', content: 'Now all you need it to verify your email , email send to you', titleColor: Colors.green,);
                               // Navigate to the confirmation screen
                               Navigator.pushReplacement(
                                 context,
@@ -348,7 +360,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                  return;
                                }
                                bool clientExist = await FirebaseMethods.checkIfEmailExist(FirebaseAuth.instance.currentUser!.email!,CollectionsNames.clientsInformation);
-                               bool handymanExist = await FirebaseMethods.checkIfEmailExist(FirebaseAuth.instance.currentUser!.email!,CollectionsNames.clientsInformation);
+                               bool handymanExist = await FirebaseMethods.checkIfEmailExist(FirebaseAuth.instance.currentUser!.email!,CollectionsNames.handymenInformation);
                                if(clientExist||handymanExist)
                                {
                                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Rest(),), (route) => false,);
@@ -447,24 +459,5 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Future<dynamic> buildShowDialog(BuildContext context,
-      {required String title,required String content,required Color titleColor}) {
-    return showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(title,style: TextStyle(color: titleColor),),
-              content: Text(content),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-  }
+
 }

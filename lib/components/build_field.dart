@@ -5,7 +5,7 @@ class BuildField{
   static Widget buildTextField(
       String hint, IconData icon, TextInputType inputType, TextEditingController controller, Function updateState, bool firstSignUp) {
     return SizedBox(
-      height: 40,
+      height: 45,
       child: TextFormField(
         controller: controller,
         keyboardType: inputType,
@@ -64,18 +64,21 @@ class BuildField{
   }
 
   static Widget buildSocialButton(String assetPath) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 2),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Center(
-        child: Image.asset(
-          assetPath,
-          width: 40,
-          height: 40,
+    return GestureDetector(
+
+      child: Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 2),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Center(
+          child: Image.asset(
+            assetPath,
+            width: 40,
+            height: 40,
+          ),
         ),
       ),
     );

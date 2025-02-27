@@ -2,12 +2,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:grad_project/components/build_field.dart';
 import 'package:grad_project/components/firebase_methods.dart';
 import 'package:grad_project/components/wrapper.dart';
 import 'package:grad_project/rest.dart';
 import "package:lottie/lottie.dart";
 import 'package:provider/provider.dart';
+import 'components/location_methods.dart';
 import 'confirm_password.dart';
 import 'login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -20,13 +22,14 @@ class ClientSignUpGoogle extends StatefulWidget {
 class _ClientSignUpGoogleState extends State<ClientSignUpGoogle> {
   TextEditingController _first_name = TextEditingController();
   TextEditingController _last_name = TextEditingController();
-  TextEditingController _location = TextEditingController();
   TextEditingController _phone_number = TextEditingController();
   bool firstSingUp = true;
   bool isEqualPassword = true;
   BoolWrapper passvis1 = BoolWrapper(false);
   BoolWrapper passvis2 = BoolWrapper(false);
   bool isloading = false;
+  bool isloading2 = false;
+  Position? _position;
   void updateState() {
     setState(() {});
   }
@@ -107,7 +110,7 @@ class _ClientSignUpGoogleState extends State<ClientSignUpGoogle> {
                               firstSingUp,
                             ),
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 6),
                           Expanded(
                             child: BuildField.buildTextField(
                               'Last name',
@@ -120,15 +123,38 @@ class _ClientSignUpGoogleState extends State<ClientSignUpGoogle> {
                           ),
                         ],
                       ),
+                      SizedBox(height: 10,),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFFFF3C00),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          icon: Icon(Icons.location_on, color: Colors.white),
+                          label: isloading2?CircularProgressIndicator(color: Colors.grey,):Text(
+                            (_position==null)?'Get Location':'Done',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: 'Nunito',
+                              fontWeight: FontWeight.w800,
+                              color: (_position==null)?Colors.white:Colors.green,
+                            ),
+                          ),
 
-                      const SizedBox(height: 8),
-                      BuildField.buildTextField(
-                        'Location',
-                        Icons.location_on,
-                        TextInputType.streetAddress,
-                        _location,
-                        updateState,
-                        firstSingUp,
+                          onPressed: (isloading2||_position!=null)?null:() async {
+                            setState(() {
+                              isloading2 = true;
+                            });
+                            _position = await LocationMethods.getUserLocation();
+                            setState(() {
+                              isloading2 = false;
+                            });
+                          },
+                        ),
                       ),
                       const SizedBox(height: 8),
                       BuildField.buildTextField(
@@ -144,6 +170,7 @@ class _ClientSignUpGoogleState extends State<ClientSignUpGoogle> {
 
                       // Sign Up Button
                       SizedBox(
+                        //TODO  loading cursor
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -171,9 +198,9 @@ class _ClientSignUpGoogleState extends State<ClientSignUpGoogle> {
                             }
 
 
-                            if (_location.text.isEmpty) {
+                            if (_position==null) {
                               print('Please enter your location');
-                              await buildShowDialog(context, title: 'Empty location', content: 'Please enter your location first', titleColor: Colors.red,);
+                              await buildShowDialog(context, title: 'Empty location', content: 'Press location button', titleColor: Colors.red,);
                               setState(() {
                                 isloading = false;
                               });
@@ -190,14 +217,8 @@ class _ClientSignUpGoogleState extends State<ClientSignUpGoogle> {
                             }
 
                             try {
-
-                              FirebaseMethods.addClientInformation(
-                                '${_first_name.text} ${_last_name.text}', // Full name
-                                FirebaseAuth.instance.currentUser!.email.toString(),
-                                _phone_number.text,
-                                _location.text,
-                              );
-
+                              DateTime now = DateTime.now();
+                              FirebaseMethods.setClientInformation(uid: FirebaseAuth.instance.currentUser!.uid, email: FirebaseAuth.instance.currentUser!.email!, fullName: '${_first_name.text.trim()} ${_last_name.text.trim()}', latitude: _position!.latitude, longitude: _position!.longitude, phoneNumber: _phone_number.text, timestamp: now);
                               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
                                 builder: (context) => Rest(),
                               ), (route)=>false);

@@ -8,11 +8,12 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'components/firebase_methods.dart';
 /*
-location => google map
-photo
-photos of past works
+in firebasefirestore save this :
+
 number of people rated this handyman => 0
 average rating from 0 to 5 => 0
+explicit skills
+hidden skills
  */
 void main() async{
   // FirebaseAuth.instance.verifyPasswordResetCode(code)

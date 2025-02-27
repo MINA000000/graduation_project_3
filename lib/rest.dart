@@ -8,9 +8,6 @@ import 'ProviderMina.dart';
 
 class Rest extends StatelessWidget {
    // Constructor to receive the email
-
-
-
   @override
   Widget build(BuildContext context) {
     final settingProvider = Provider.of<Providermina>(context);
