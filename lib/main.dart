@@ -22,8 +22,8 @@ void main() async{
     await Firebase.initializeApp();
     if(FirebaseAuth.instance.currentUser!=null)
       {
-        bool handymanExit = await FirebaseMethods.checkIfEmailExist(FirebaseAuth.instance.currentUser!.email!, CollectionsNames.handymenInformation);
-        bool clientExit = await FirebaseMethods.checkIfEmailExist(FirebaseAuth.instance.currentUser!.email!, CollectionsNames.clientsInformation);
+        bool handymanExit = await FirebaseMethods.checkIfUserExists(FirebaseAuth.instance.currentUser!.uid, CollectionsNames.handymenInformation);
+        bool clientExit = await FirebaseMethods.checkIfUserExists(FirebaseAuth.instance.currentUser!.uid, CollectionsNames.clientsInformation);
         if(handymanExit||clientExit)
           {
             CollectionsNames.isExit = true;

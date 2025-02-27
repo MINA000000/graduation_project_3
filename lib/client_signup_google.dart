@@ -218,7 +218,7 @@ class _ClientSignUpGoogleState extends State<ClientSignUpGoogle> {
 
                             try {
                               DateTime now = DateTime.now();
-                              FirebaseMethods.setClientInformation(uid: FirebaseAuth.instance.currentUser!.uid, email: FirebaseAuth.instance.currentUser!.email!, fullName: '${_first_name.text.trim()} ${_last_name.text.trim()}', latitude: _position!.latitude, longitude: _position!.longitude, phoneNumber: _phone_number.text, timestamp: now);
+                              await FirebaseMethods.setClientInformation(uid: FirebaseAuth.instance.currentUser!.uid, email: FirebaseAuth.instance.currentUser!.email!, fullName: '${_first_name.text.trim()} ${_last_name.text.trim()}', latitude: _position!.latitude, longitude: _position!.longitude, phoneNumber: _phone_number.text, timestamp: now);
                               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
                                 builder: (context) => Rest(),
                               ), (route)=>false);

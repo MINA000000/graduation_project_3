@@ -13,7 +13,7 @@ class Rest extends StatelessWidget {
     final settingProvider = Provider.of<Providermina>(context);
     // print(settingProvider.email);
     return FutureBuilder<bool>(
-      future: FirebaseMethods.checkIfEmailExist(FirebaseAuth.instance.currentUser!.email!,CollectionsNames.clientsInformation), // Perform the async operation
+      future: FirebaseMethods.checkIfUserExists(FirebaseAuth.instance.currentUser!.uid,CollectionsNames.clientsInformation), // Perform the async operation
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the result

@@ -10,11 +10,15 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseMethods{
 
-  static Future<bool> checkIfEmailExist(String email,String collection) async {
+  static Future<bool> checkIfUserExists(String uid, String collection) async {
+    // Get a reference to the Firestore collection
     CollectionReference usersInformation = FirebaseFirestore.instance.collection(collection);
-    QuerySnapshot querySnapshot = await usersInformation.where('email', isEqualTo: email).get();
-    // print(email);
-    return querySnapshot.docs.isNotEmpty;
+
+    // Query the collection to check if a document with the given uid exists
+    DocumentSnapshot documentSnapshot = await usersInformation.doc(uid).get();
+
+    // Return true if the document exists, otherwise return false
+    return documentSnapshot.exists;
   }
 
   static Future<void> setClientInformation({
@@ -29,7 +33,7 @@ class FirebaseMethods{
     try {
       // Reference to the Firestore collection
       final CollectionReference handymenCollection =
-      FirebaseFirestore.instance.collection('client_information');
+      FirebaseFirestore.instance.collection('clients_information');
 
       // Set or update the document with the given UID
       await handymenCollection.doc(uid).set({

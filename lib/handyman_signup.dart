@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:grad_project/components/build_field.dart';
@@ -48,15 +47,17 @@ class _HandymanSignUpState extends State<HandymanSignUp> {
   int imageNum = 0;
   Position? _position;
   bool firstSignUp = true;
-  String getExplicitSkills(List<bool> _selectedSkills,List<String> skills)
+  String getExplicitSkills(List<String> skills)
   {
     String explicitySkills = '';
     for(int i=0;i<_selectedSkills.length;i++)
       {
         if(i>=skills.length)
           return "error happened : length of _selectedSkills not equal to length of skills";
-        explicitySkills += skills[i];
-        explicitySkills +=' ';
+        if(_selectedSkills[i]==true) {
+          explicitySkills += skills[i];
+          explicitySkills += ' ';
+        }
       }
     return explicitySkills;
   }
@@ -441,7 +442,7 @@ class _HandymanSignUpState extends State<HandymanSignUp> {
                                 await FirebaseMethods.signInWithEmailPassword(_email.text, _password.text);
                                 String imageURL = await FirebaseMethods.uploadImage(_image!);
                                 DateTime now = DateTime.now();
-                                String explicitSkills = getExplicitSkills(_selectedSkills, CategorySkills.categorySkills[_selectedCategory]!);
+                                String explicitSkills = getExplicitSkills( CategorySkills.categorySkills[_selectedCategory]!);
                                 await FirebaseMethods.setHandymanInformation(uid: FirebaseAuth.instance.currentUser!.uid, category: _selectedCategory, description: _projectInfoController.text, email: _email.text, explicitSkills: explicitSkills.trim(), fullName: '${_firstName.text.trim()} ${_lastName.text.trim()}', implicitSkills: '', latitude: _position!.latitude, longitude: _position!.longitude , phoneNumber: _phoneNumber.text, profilePicture: imageURL, ratingAverage: 0, ratingCount:0 , timestamp: now);
                                 await FirebaseAuth.instance.currentUser!.sendEmailVerification();
                                 await DialogUtils.buildShowDialog(context, title: 'Done, last step', content: 'Confirm email, email send to you', titleColor: Colors.green,);
@@ -486,8 +487,8 @@ class _HandymanSignUpState extends State<HandymanSignUp> {
                                     // await DialogUtils.buildShowDialog(context, title: 'Sign', content: 'please complete your information !', titleColor: Colors.orange);
                                     return;
                                   }
-                                  bool handymanExit = await FirebaseMethods.checkIfEmailExist(FirebaseAuth.instance.currentUser!.email!, CollectionsNames.handymenInformation);
-                                  bool clientExit = await FirebaseMethods.checkIfEmailExist(FirebaseAuth.instance.currentUser!.email!, CollectionsNames.clientsInformation);
+                                  bool handymanExit = await FirebaseMethods.checkIfUserExists(FirebaseAuth.instance.currentUser!.uid, CollectionsNames.handymenInformation);
+                                  bool clientExit = await FirebaseMethods.checkIfUserExists(FirebaseAuth.instance.currentUser!.uid, CollectionsNames.clientsInformation);
                                   if(!handymanExit&&!clientExit){
                                     await DialogUtils.buildShowDialog(context, title: 'Information missing', content: 'please complete your information !', titleColor: Colors.orange);
                                     if(settingProvider.role=='client')
