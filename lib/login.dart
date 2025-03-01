@@ -255,8 +255,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                       // await DialogUtils.buildShowDialog(context, title: 'Sign', content: 'please complete your information !', titleColor: Colors.orange);
                                       return;
                                     }
+                                  // print(FirebaseAuth.instance.currentUser!.uid);
                                   bool handymanExist = await FirebaseMethods.checkIfUserExists(FirebaseAuth.instance.currentUser!.uid, CollectionsNames.handymenInformation);
                                   bool clientExist = await FirebaseMethods.checkIfUserExists(FirebaseAuth.instance.currentUser!.uid, CollectionsNames.clientsInformation);
+                                  // print(handymanExist);
+                                  // print(clientExist);
                                   if(!handymanExist&&!clientExist){
                                     await DialogUtils.buildShowDialog(context, title: 'Information missing', content: 'please complete your information !', titleColor: Colors.orange);
                                     if(providerSetting.role=='client')

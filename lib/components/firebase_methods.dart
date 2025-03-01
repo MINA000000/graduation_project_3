@@ -33,7 +33,7 @@ class FirebaseMethods{
     try {
       // Reference to the Firestore collection
       final CollectionReference handymenCollection =
-      FirebaseFirestore.instance.collection('clients_information');
+      FirebaseFirestore.instance.collection(CollectionsNames.clientsInformation);
 
       // Set or update the document with the given UID
       await handymenCollection.doc(uid).set({
@@ -50,6 +50,38 @@ class FirebaseMethods{
       rethrow;
     }
   }
+
+  static Future<void> setRequestInformation({
+    required String uid,
+    required String request,
+    required String? imageURL,
+    required String status,
+    required String category,
+    required String? handyman,
+    required DateTime timestamp,
+  }) async {
+    try {
+      // Reference to the Firestore collection
+      final CollectionReference handymenCollection =
+      FirebaseFirestore.instance.collection(CollectionsNames.requestInformation);
+
+      // Set or update the document with the given UID
+      await handymenCollection.add({
+        'uid':uid,
+        'request': request,
+        'imageURL': imageURL,
+        'status': status,
+        'category':category,
+        'handyman':handyman,
+        'timestamp': timestamp,
+      }); // Use merge to update specific fields without overwriting the entire document
+
+      // print('Handyman information set/updated successfully for UID: $uid');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   static Future<void> signInWithEmailPassword(String email, String password) async {
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -143,7 +175,7 @@ class FirebaseMethods{
     try {
       // Reference to the Firestore collection
       final CollectionReference handymenCollection =
-      FirebaseFirestore.instance.collection('handymen_information');
+      FirebaseFirestore.instance.collection(CollectionsNames.handymenInformation);
 
       // Set or update the document with the given UID
       await handymenCollection.doc(uid).set({
@@ -169,7 +201,36 @@ class FirebaseMethods{
   }
 }
 class CollectionsNames{
-  static String clientsInformation = "clients_information";
+  static String clientsInformation = "client_information";
   static String handymenInformation = "handymen_information";
+  static String requestInformation = "request_information";
+
   static bool isExit = false;
+}
+
+class RequestStatus {
+  static String approved = "approved";
+  static String notApproved = "notApproved";
+  static String done = "done";
+}
+
+class CategoriesNames {
+  static final String _carpenter = "Carpenter";
+  static final String _plumbing = "Plumbing";
+  static final String _blacksmith = "Blacksmith";
+  static final String _electrical = "Electrical";
+  static final String _painter = "Painter";
+  static final String _aluminum = "Aluminum";
+  static final String _marble = "Marble";
+  static final String _upholsterer = "Upholsterer";
+
+  // Getters to access the private variables with modified formatting
+  static String get carpenter => _carpenter.replaceAll(' ', '\n');
+  static String get plumbing => _plumbing.replaceAll(' ', '\n');
+  static String get blacksmith => _blacksmith.replaceAll(' ', '\n');
+  static String get electrical => _electrical.replaceAll(' ', '\n');
+  static String get painter => _painter.replaceAll(' ', '\n');
+  static String get aluminum => _aluminum.replaceAll(' ', '\n');
+  static String get marble => _marble.replaceAll(' ', '\n');
+  static String get upholsterer => _upholsterer.replaceAll(' ', '\n');
 }

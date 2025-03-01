@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:grad_project/components/build_field.dart';
-import 'package:grad_project/components/category_skills.dart';
+import 'package:grad_project/components/skills_data.dart';
 import 'package:grad_project/components/location_methods.dart';
 import 'package:grad_project/rest.dart';
 import 'package:image_picker/image_picker.dart';
@@ -29,18 +29,12 @@ class HandymanSignupGoogle extends StatefulWidget {
 }
 
 class _HandymanSignupGoogleState extends State<HandymanSignupGoogle> {
+
   final TextEditingController _firstName = TextEditingController();
   final TextEditingController _lastName = TextEditingController();
-  // final TextEditingController _email = TextEditingController();
-  // final TextEditingController _password = TextEditingController();
-  // final TextEditingController _confirmPassword = TextEditingController();
   final TextEditingController _phoneNumber = TextEditingController();
-  // BoolWrapper passvis1 = BoolWrapper(false);
-  // BoolWrapper passvis2 = BoolWrapper(false);
-  // bool isEqualPassword = true;
   List<bool> _selectedSkills = List.generate(5, (_) => false);
   String _selectedCategory = 'Carpenter';
-  // Position position = Position(longitude: 0, latitude: 0);
   final TextEditingController _projectInfoController = TextEditingController();
   bool isloading = false;
   bool isloading2 = false;
@@ -48,6 +42,7 @@ class _HandymanSignupGoogleState extends State<HandymanSignupGoogle> {
   int imageNum = 0;
   Position? _position;
   bool firstSignUp = true;
+
   String getExplicitSkills(List<String> skills)
   {
     String explicitySkills = '';
@@ -138,7 +133,7 @@ class _HandymanSignupGoogleState extends State<HandymanSignupGoogle> {
                         GestureDetector(
                           onTap: ()async{
                             await _pickImage();
-                            print(_image!.path);
+                            // print(_image!.path);
                           },
                           child: Stack(
                             alignment: Alignment.center,
@@ -254,14 +249,14 @@ class _HandymanSignupGoogleState extends State<HandymanSignupGoogle> {
                             ),
                           ),
                           items: [
-                            'Carpenter',
-                            'Plumbing',
-                            'Blacksmith',
-                            'Electrical',
-                            'Painter',
-                            'Aluminum worker',
-                            'Marble worker',
-                            'Upholsterer',
+                            CategoriesNames.carpenter,
+                            CategoriesNames.plumbing,
+                            CategoriesNames.blacksmith,
+                            CategoriesNames.electrical,
+                            CategoriesNames.painter,
+                            CategoriesNames.aluminum,
+                            CategoriesNames.marble,
+                            CategoriesNames.upholsterer,
                             // 'Other'
                           ]
                               .map((category) => DropdownMenuItem(
@@ -282,7 +277,7 @@ class _HandymanSignupGoogleState extends State<HandymanSignupGoogle> {
                         Wrap(
                           spacing: 10,
                           runSpacing: 10,
-                          children: List.generate(CategorySkills.categorySkills[_selectedCategory]!.length, (index) {
+                          children: List.generate(SkillsData.categorySkills[_selectedCategory]!.length, (index) {
                             return Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -294,7 +289,7 @@ class _HandymanSignupGoogleState extends State<HandymanSignupGoogle> {
                                     });
                                   },
                                 ),
-                                Text('${CategorySkills.categorySkills[_selectedCategory]![index]}',style: TextStyle(color: Colors.deepOrange),),
+                                Text('${SkillsData.categorySkills[_selectedCategory]![index]}',style: TextStyle(color: Colors.deepOrange),),
                               ],
                             );
                           }),
@@ -378,7 +373,7 @@ class _HandymanSignupGoogleState extends State<HandymanSignupGoogle> {
                                 // await FirebaseMethods.signInWithEmailPassword(_email.text, _password.text);
                                 String imageURL = await FirebaseMethods.uploadImage(_image!);
                                 DateTime now = DateTime.now();
-                                String explicitSkills = getExplicitSkills( CategorySkills.categorySkills[_selectedCategory]!);
+                                String explicitSkills = getExplicitSkills( SkillsData.categorySkills[_selectedCategory]!);
                                 String email = FirebaseAuth.instance.currentUser!.email!;
                                 await FirebaseMethods.setHandymanInformation(uid: FirebaseAuth.instance.currentUser!.uid, category: _selectedCategory, description: _projectInfoController.text, email: email, explicitSkills: explicitSkills.trim(), fullName: '${_firstName.text.trim()} ${_lastName.text.trim()}', implicitSkills: '', latitude: _position!.latitude, longitude: _position!.longitude, phoneNumber: _phoneNumber.text, profilePicture: imageURL, ratingAverage: 0, ratingCount:0 , timestamp: now);
                                 // await DialogUtils.buildShowDialog(context, title: 'Done, last step', content: 'Confirm email, email send to you', titleColor: Colors.green,);
