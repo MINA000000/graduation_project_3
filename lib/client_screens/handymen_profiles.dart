@@ -1,22 +1,57 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:grad_project/components/firebase_methods.dart';
 
-class HanymanProfile extends StatelessWidget {
-  final List<Map<String, dynamic>> handymen = List.generate(4, (index) {
-    return {
-      'name': 'Amr Ali Ahmed',
-      'profession': 'Plumber',
-      'projects': 50,
-      'rating': 4.5,
-      'imageUrl': 'https://via.placeholder.com/150', // Placeholder image
-    };
-  });
+class HanymenProfiles extends StatefulWidget {
+  String categoryName;
+  HanymenProfiles({required this.categoryName});
+
+  @override
+  State<HanymenProfiles> createState() => _HanymenProfilesState();
+}
+
+class _HanymenProfilesState extends State<HanymenProfiles> {
+  bool masterLoading = true;
+  List<QueryDocumentSnapshot> handymen=[];
+  Future<void> fetchHandymenData() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection(CollectionsNames.handymenInformation)
+          .where('category', isEqualTo: widget.categoryName)
+          .get();
+      handymen = querySnapshot.docs;
+      setState(() {
+        masterLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching data: $e");
+      setState(() {
+        masterLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();  // ✅ Always call super.initState() first
+    fetchHandymenData();
+  }
+  // final List<Map<String, dynamic>> handymen = List.generate(4, (index) {
+  //   return {
+  //     'name': 'Amr Ali Ahmed',
+  //     'profession': 'Plumber',
+  //     'projects': 50,
+  //     'rating': 4.5,
+  //     'imageUrl': 'https://via.placeholder.com/150', // Placeholder image
+  //   };
+  // });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // No default AppBar – we use our custom top bar in the body.
-      body: Container(
+      body:masterLoading?Center(child: CircularProgressIndicator(color: Colors.blue,),): Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
@@ -67,22 +102,22 @@ class HanymanProfile extends StatelessWidget {
                     child: ListTile(
                       leading: CircleAvatar(
                         radius: 30,
-                        backgroundImage: NetworkImage(handyman['imageUrl']),
+                        backgroundImage: NetworkImage(handyman['profile_picture']),
                       ),
                       title: Text(
-                        handyman['name'],
+                        handyman['full_name'],
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(handyman['profession']),
-                          Text('He did ${handyman['projects']} projects'),
+                          Text(handyman['category']),
+                          Text('He did ${handyman['projects_count']} projects'),
                           Row(
                             children: List.generate(
                               5,
                                   (i) => Icon(
-                                i < handyman['rating'].floor()
+                                i < handyman['rating_average'].floor()
                                     ? Icons.star
                                     : Icons.star_border,
                                 color: Colors.orange,

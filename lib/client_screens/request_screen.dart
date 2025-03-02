@@ -7,6 +7,8 @@ import 'package:grad_project/components/firebase_methods.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'handymen_profiles.dart';
+
 class RequestScreen extends StatefulWidget {
   String categoryName;
   RequestScreen({required this.categoryName});
@@ -134,6 +136,9 @@ class _RequestScreenState extends State<RequestScreen> {
               // Send Button
               ElevatedButton(
                 onPressed: isloading?null:()async{
+                  //TODO
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => HanymenProfiles(categoryName: widget.categoryName,),));
+                  return;
                   setState(() {
                     isloading = true;
                   });
@@ -155,6 +160,7 @@ class _RequestScreenState extends State<RequestScreen> {
                     DateTime now = DateTime.now();
                     await FirebaseMethods.setRequestInformation(uid: FirebaseAuth.instance.currentUser!.uid, request:_requestController.text, imageURL: downloadURL, status: RequestStatus.notApproved, timestamp: now, category: widget.categoryName,handyman: null);
                     await DialogUtils.buildShowDialog(context, title: "Done", content: 'Waited handymen to accept your request', titleColor: Colors.green);
+
                   }
                   catch(e)
                   {

@@ -6,6 +6,7 @@ import 'package:grad_project/login.dart';
 import 'package:grad_project/rest.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'client_screens/master_page_client.dart';
 import 'components/firebase_methods.dart';
 /*
 in firebasefirestore save this :
@@ -49,7 +50,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: (FirebaseAuth.instance.currentUser!=null&&FirebaseAuth.instance.currentUser!.emailVerified&&CollectionsNames.isExit)?Rest():ChooseScreen(),
+      home: MasterPageClient(),//(FirebaseAuth.instance.currentUser!=null&&FirebaseAuth.instance.currentUser!.emailVerified&&CollectionsNames.isExit)?Rest():ChooseScreen(),
     );
   }
 }

@@ -191,6 +191,7 @@ class FirebaseMethods{
         'profile_picture': profilePicture,
         'rating_average': ratingAverage,
         'rating_count': ratingCount,
+        'projects_count':0,
         'timestamp': timestamp,
       }, SetOptions(merge: true)); // Use merge to update specific fields without overwriting the entire document
 
