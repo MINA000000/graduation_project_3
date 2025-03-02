@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'ProviderMina.dart';
 import 'client_signup_google.dart';
+import 'components/collections.dart';
 import 'components/dialog_utils.dart';
 import 'components/firebase_methods.dart';
 import 'components/validate_inputs.dart';

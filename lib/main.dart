@@ -7,6 +7,7 @@ import 'package:grad_project/rest.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'client_screens/master_page_client.dart';
+import 'components/collections.dart';
 import 'components/firebase_methods.dart';
 /*
 in firebasefirestore save this :

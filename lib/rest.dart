@@ -7,6 +7,7 @@ import 'package:grad_project/main.dart';
 import 'package:provider/provider.dart';
 import 'ProviderMina.dart';
 import 'client_screens/client_home.dart';
+import 'components/collections.dart';
 
 class Rest extends StatelessWidget {
    // Constructor to receive the email

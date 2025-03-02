@@ -12,6 +12,7 @@ import 'package:grad_project/rest.dart';
 import "package:lottie/lottie.dart";
 import 'package:provider/provider.dart';
 import 'client_signup_google.dart';
+import 'components/collections.dart';
 import 'components/location_methods.dart';
 import 'confirm_password.dart';
 import 'login.dart';

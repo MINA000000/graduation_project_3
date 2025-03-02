@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'collections.dart';
+
 class FirebaseMethods{
 
   static Future<bool> checkIfUserExists(String uid, String collection) async {
@@ -201,13 +203,7 @@ class FirebaseMethods{
     }
   }
 }
-class CollectionsNames{
-  static String clientsInformation = "client_information";
-  static String handymenInformation = "handymen_information";
-  static String requestInformation = "request_information";
 
-  static bool isExit = false;
-}
 
 class RequestStatus {
   static String approved = "approved";

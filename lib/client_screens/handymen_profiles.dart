@@ -1,7 +1,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:grad_project/client_screens/handyman_details.dart';
 import 'package:grad_project/components/firebase_methods.dart';
+import 'package:grad_project/components/collections.dart';
 
 class HanymenProfiles extends StatefulWidget {
   String categoryName;
@@ -14,6 +16,7 @@ class HanymenProfiles extends StatefulWidget {
 class _HanymenProfilesState extends State<HanymenProfiles> {
   bool masterLoading = true;
   List<QueryDocumentSnapshot> handymen=[];
+
   Future<void> fetchHandymenData() async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -37,15 +40,6 @@ class _HanymenProfilesState extends State<HanymenProfiles> {
     super.initState();  // ✅ Always call super.initState() first
     fetchHandymenData();
   }
-  // final List<Map<String, dynamic>> handymen = List.generate(4, (index) {
-  //   return {
-  //     'name': 'Amr Ali Ahmed',
-  //     'profession': 'Plumber',
-  //     'projects': 50,
-  //     'rating': 4.5,
-  //     'imageUrl': 'https://via.placeholder.com/150', // Placeholder image
-  //   };
-  // });
 
   @override
   Widget build(BuildContext context) {
@@ -95,39 +89,44 @@ class _HanymenProfilesState extends State<HanymenProfiles> {
                 itemCount: handymen.length,
                 itemBuilder: (context, index) {
                   final handyman = handymen[index];
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        radius: 30,
-                        backgroundImage: NetworkImage(handyman['profile_picture']),
+                  return GestureDetector(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => HandymanDetailsPage(handyman: handyman),));
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      title: Text(
-                        handyman['full_name'],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(handyman['category']),
-                          Text('He did ${handyman['projects_count']} projects'),
-                          Row(
-                            children: List.generate(
-                              5,
-                                  (i) => Icon(
-                                i < handyman['rating_average'].floor()
-                                    ? Icons.star
-                                    : Icons.star_border,
-                                color: Colors.orange,
-                                size: 16,
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          radius: 30,
+                          backgroundImage: NetworkImage(handyman[HandymanFieldsName.profilePicture]),
+                        ),
+                        title: Text(
+                          handyman[HandymanFieldsName.fullName],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(handyman[HandymanFieldsName.category]),
+                            Text('He did ${handyman[HandymanFieldsName.projectsCount]} projects'),
+                            Row(
+                              children: List.generate(
+                                5,
+                                    (i) => Icon(
+                                  i < handyman[HandymanFieldsName.ratingAverage].floor()
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: Colors.orange,
+                                  size: 16,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios),
                       ),
-                      trailing: const Icon(Icons.arrow_forward_ios),
                     ),
                   );
                 },
